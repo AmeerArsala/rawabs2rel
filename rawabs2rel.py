@@ -1,6 +1,6 @@
 """Turn local absolute imports into relative ones."""
 
-__version__ = '1.1.0'
+__version__ = "1.1.0"
 
 
 ### standard library imports
@@ -14,7 +14,7 @@ from tokenize import tokenize, NAME
 from io import BytesIO
 
 
-def abs2rel():
+def rawabs2rel():
     """Convert local absolute imports into relative ones.
 
     This function must be executed in the top-level
@@ -27,38 +27,30 @@ def abs2rel():
     satisfy the use-case for which this command
     was created.
     """
-    print(f"Executing abs2rel on {Path('.').resolve()}")
+    print(f"Executing rawabs2rel on {Path('.').resolve()}")
 
     ### list all existing python files recursively
-    all_py_files = tuple(Path('.').rglob('*.py'))
+    all_py_files = tuple(Path(".").rglob("*.py"))
 
     ### create a map associating each path to a
     ### format where it is divided with a dot notation
     ### as if it were to be absolute-imported
 
     path_to_abs_dotted_import = {
-      path : '.'.join(path.parts[:-1] + (path.stem,))
-      for path in all_py_files
+        path: ".".join(path.parts[:-1] + (path.stem,)) for path in all_py_files
     }
 
     ### create a map from the previous one where the
     ### keys are mapped to the values
 
     abs_dotted_import_to_path = {
-
-      import_text: path
-
-      for path, import_text
-      in path_to_abs_dotted_import.items()
-
+        import_text: path for path, import_text in path_to_abs_dotted_import.items()
     }
 
     ### alias path_to_abs_dotted_import values as the
     ### possible local imports
 
-    possible_local_imports = (
-      path_to_abs_dotted_import.values()
-    )
+    possible_local_imports = path_to_abs_dotted_import.values()
 
     ### gather data about all lines in each python file
     ### with imports starting with 'from'
@@ -69,34 +61,27 @@ def abs2rel():
 
     for path in all_py_files:
 
-        import_data = get_imports_data(
-                        path,
-                        possible_local_imports
-                      )
+        import_data = get_imports_data(path, possible_local_imports)
 
         if import_data:
             path_to_import_data[path] = import_data
 
     ### notify user of nature of changes to be made
 
-    no_of_imports = sum(
-                      len(imports)
-                      for imports
-                      in path_to_import_data.values()
-                    )
+    no_of_imports = sum(len(imports) for imports in path_to_import_data.values())
 
     no_of_files_to_change = len(path_to_import_data)
-    no_of_py_files        = len(all_py_files)
+    no_of_py_files = len(all_py_files)
 
     ### perform changes
 
     for path in path_to_import_data:
 
         replace_imports(
-          path,
-          path_to_import_data,
-          path_to_abs_dotted_import,
-          abs_dotted_import_to_path,
+            path,
+            path_to_import_data,
+            path_to_abs_dotted_import,
+            abs_dotted_import_to_path,
         )
 
 
@@ -121,14 +106,8 @@ def get_imports_data(path, possible_local_imports):
     ### obtain the file tokens
 
     tokens = tokenize(
-
-               BytesIO(
-                 path
-                 .read_text(encoding='utf-8')
-                 .encode('utf-8')
-               ).readline
-
-             )
+        BytesIO(path.read_text(encoding="utf-8").encode("utf-8")).readline
+    )
 
     ### create a variable to keep track of the lines where
     ### we find a 'from' keyword
@@ -141,13 +120,11 @@ def get_imports_data(path, possible_local_imports):
     ### absolute local import
 
     for (
-
-      token_type,
-      string,
-      (_, string_start),
-      (line_number, string_end),
-      line_text,
-
+        token_type,
+        string,
+        (_, string_start),
+        (line_number, string_end),
+        line_text,
     ) in tokens:
 
         ### if we found a 'from' keyword but we are
@@ -156,12 +133,7 @@ def get_imports_data(path, possible_local_imports):
         ### interested in 'from' and 'imports' that are
         ### not on the same line)
 
-        if (
-
-          line_where_found_from is not None
-          and line_number != line_where_found_from
-
-        ):
+        if line_where_found_from is not None and line_number != line_where_found_from:
 
             line_where_found_from = None
 
@@ -174,12 +146,7 @@ def get_imports_data(path, possible_local_imports):
 
         if line_where_found_from is None:
 
-            if (
-
-                  token_type == NAME
-              and string     == 'from'
-
-            ):
+            if token_type == NAME and string == "from":
 
                 line_where_found_from = line_number
                 import_start_index = string_end + 1
@@ -187,13 +154,7 @@ def get_imports_data(path, possible_local_imports):
         ### if otherwise we already found a 'from' keyword
         ### and now encounter an 'import' keyword...
 
-
-        elif (
-
-              token_type == NAME
-          and string     == 'import'
-
-        ):
+        elif token_type == NAME and string == "import":
             ## store the index of the character before the
             ## start of the 'import' keyword (such index
             ## represents the end of the import text
@@ -204,9 +165,8 @@ def get_imports_data(path, possible_local_imports):
             ## 'import' keywords, without the spaces;
             ## this is the absolute dotted import
 
-            abs_dotted_import = (
-              line_text[import_start_index : import_end_index]
-              .replace(' ', '')
+            abs_dotted_import = line_text[import_start_index:import_end_index].replace(
+                " ", ""
             )
 
             ## now we only need to know if the dotted
@@ -226,9 +186,9 @@ def get_imports_data(path, possible_local_imports):
                 ## to the line index
 
                 local_imports_data[line_index] = (
-                  abs_dotted_import,
-                  import_start_index,
-                  import_end_index,
+                    abs_dotted_import,
+                    import_start_index,
+                    import_end_index,
                 )
 
             ## regardless of whether or not the import is
@@ -237,17 +197,16 @@ def get_imports_data(path, possible_local_imports):
             ## the next 'from' keyword
             line_where_found_from = None
 
-
     ### finally return the data
     return local_imports_data
 
 
 def replace_imports(
-      path,
-      path_to_import_data,
-      path_to_abs_dotted_import,
-      abs_dotted_import_to_path,
-    ):
+    path,
+    path_to_import_data,
+    path_to_abs_dotted_import,
+    abs_dotted_import_to_path,
+):
     """Replace imports on given path.
 
     Parameters
@@ -275,12 +234,7 @@ def replace_imports(
     ### it is preserved when we concatenated the
     ### lines together to save the file
 
-    lines = (
-
-      path.read_text(encoding='utf-8')
-      .splitlines(keepends=True)
-
-    )
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
 
     ### retrieve the import data for the path, that is,
     ### data about the absolute local imports it contains
@@ -290,23 +244,18 @@ def replace_imports(
     ### absolute local imports by relative ones
 
     for (
-
-      line_index,
-
-      (
-        abs_dotted_import,
-        import_start_index,
-        import_end_index,
-      ),
-
+        line_index,
+        (
+            abs_dotted_import,
+            import_start_index,
+            import_end_index,
+        ),
     ) in import_data.items():
 
         ## obtain the path represented by the absolute
         ## local import to be replaced
 
-        path_of_absolute_import = (
-          abs_dotted_import_to_path[abs_dotted_import]
-        )
+        path_of_absolute_import = abs_dotted_import_to_path[abs_dotted_import]
 
         ## use such path to obtain yet another version
         ## of it, but relative to the path where the
@@ -319,17 +268,8 @@ def replace_imports(
         ## 'from [formatted string here] import ...'
         ## statement
 
-        rel_dotted_import = (
-
-          '.'.join(
-
-                '' if part == '..' else part
-
-                for part in (
-                  rpath.parts[:-1] + (rpath.stem,)
-                )
-
-              )
+        rel_dotted_import = ".".join(
+            "" if part == ".." else part for part in (rpath.parts[:-1] + (rpath.stem,))
         )
 
         ## now that we have the relative local import
@@ -357,15 +297,14 @@ def replace_imports(
         # then, replace the line text by the new one
         lines[line_index] = new_text
 
-
     ### finally, rewrite the file contents;
     ###
     ### note that we don't need to used a line breaking
     ### character in between the lines, because the lines
     ### kept their line breaks when we separated them
     ### at the beginning of this function
-    path.write_text(''.join(lines), encoding='utf-8')
+    path.write_text("".join(lines), encoding="utf-8")
 
 
-if __name__ == '__main__':
-    abs2rel()
+if __name__ == "__main__":
+    rawabs2rel()

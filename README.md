@@ -10,19 +10,18 @@ This command only recognizes local absolute imports which are in the `from ... i
 
 This script was originally tested on the [nodezator app](https://github.com/IndiePython/nodezator) at commit [be4c17f](https://github.com/IndiePython/nodezator/commit/be4c17f4c9d09951b48345836fb24de70f5ee90f), managing to convert all 1685 existing absolute local imports across 270 python files into relative imports successfully, without needing any additional manual work.
 
-If you want to try this yourself, just clone nodezator, checkout the mentioned commit and, inside the nodezator/nodezator folder, execute the `abs2rel` command. Then, go up one folder level and launch the app with `python -m nodezator` and you'll see that the local relative imports work properly, launching the app without problems.
-
+If you want to try this yourself, just clone nodezator, checkout the mentioned commit and, inside the nodezator/nodezator folder, execute the `rawabs2rel` command. Then, go up one folder level and launch the app with `python -m nodezator` and you'll see that the local relative imports work properly, launching the app without problems.
 
 ## Installation
 
 ```bash
-pip install abs2rel
+pip install rawabs2rel
 ```
 
 ## Usage
 
-After installing, just go to your package top-level directory and execute the `abs2rel` command. Before actually changing the files, the script presents the number of imports and files that are about to be changed and asks the user to confirm in order to proceed. Remember to make a backup of your package before executing this script, just in case.
+After installing, just go to your package top-level directory and execute the `rawabs2rel` command. Before actually changing the files, the script presents the number of imports and files that are about to be changed and asks the user to confirm in order to proceed. Remember to make a backup of your package before executing this script, just in case.
 
 ## License
 
-abs2rel is dedicated to the public domain with [The Unlicense](https://unlicense.org/).
+rawabs2rel is dedicated to the public domain with [The Unlicense](https://unlicense.org/).
