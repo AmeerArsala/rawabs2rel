@@ -1,6 +1,8 @@
-# abs2rel
+# rawabs2rel
 
 A python script that traverses a whole package turning local absolute imports into relative ones.
+
+The difference between this and abs2rel is that this does NOT ask for consent.
 
 It can reduce substantialy the time needed to convert local absolute imports from a Python package into local relative imports. Additionally, because the conversion is automated, it is less error-prone than having someone make the changes manually.
 
