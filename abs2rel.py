@@ -88,20 +88,6 @@ def abs2rel():
     no_of_files_to_change = len(path_to_import_data)
     no_of_py_files        = len(all_py_files)
 
-    print(
-      f"We are about to replace {no_of_imports} imports"
-      f" in {no_of_files_to_change} of {no_of_py_files}"
-       " python files in this directory tree. Are you sure"
-       " you want to proceed? (y/n)"
-    )
-
-    answer = input()
-
-    if answer.lower() != 'y':
-
-        print("Aborted operation.")
-        return
-
     ### perform changes
 
     for path in path_to_import_data:
